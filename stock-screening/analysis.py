@@ -128,45 +128,56 @@ def calculate_macd_divergences(data, lookback_left=5, lookback_right=5):
                 if price_lh and osc_hh and above_zero:
                     hidden_bear_div_dates.append(data.index[i])  # Store the date of the divergence
 
-    # Output the dates where the divergences occurred
-    print("\nBullish Divergence Dates:")
-    print(bull_div_dates)
+    # Combine and sort all bullish divergence dates
+    all_bull_div_dates = sorted(bull_div_dates + hidden_bull_div_dates)
 
-    print("\nBearish Divergence Dates:")
-    print(bear_div_dates)
+    # Check if the latest bullish divergence is within the last 5 days
+    currently_buyable = False
+    if all_bull_div_dates:
+        latest_divergence_date = all_bull_div_dates[-1]
+        latest_stock_date = data.index[-1]
+        if (latest_stock_date - latest_divergence_date).days <= 5:
+            currently_buyable = True
+    print(currently_buyable)
+    return currently_buyable
 
-    print("\nHidden Bullish Divergence Dates:")
-    print(hidden_bull_div_dates)
+def load_tickers_from_file(filename):
+    """Reads a comma-separated list of tickers from a file and returns a list."""
+    with open(filename, 'r') as file:
+        content = file.read().strip()  # Read and remove leading/trailing spaces
+        tickers = content.split(',')   # Split by comma
+        tickers = [ticker.strip().upper() for ticker in tickers]  # Clean up spaces and ensure uppercase
+    return tickers
 
-    print("\nHidden Bearish Divergence Dates:")
-    print(hidden_bear_div_dates)
-
-    return data
+ticker_list = load_tickers_from_file("tickers.txt")
+print(ticker_list)
+buyable_tickers = []
 
 
 if __name__ == "__main__":
-    ticker = "INTC"  # Change this to any stock ticker
     
     # Calculate dates dynamically
     end_date = datetime.now().strftime("%Y-%m-%d")
-    start_date = (datetime.now() - timedelta(days=1*365)).strftime("%Y-%m-%d")
-    
-    print(f"Fetching data from {start_date} to {end_date}")
-    
+    start_date = (datetime.now() - timedelta(days=1*365)).strftime("%Y-%m-%d")   
+    for ticker in ticker_list:
+        print(ticker)
     # Get the full stock data
-    stock_data = fetch_stock_data(ticker, start_date, end_date)
+        stock_data = fetch_stock_data(ticker, start_date, end_date)
     
     # Calculate MACD
-    macd_data = calculate_macd(stock_data)
+        macd_data = calculate_macd(stock_data)
     
     # Merge MACD data with stock data
-    plot_data = stock_data.copy()
-    plot_data['MACD'] = macd_data['MACD']
-    plot_data['Signal_Line'] = macd_data['Signal_Line']
+        plot_data = stock_data.copy()
+        plot_data['MACD'] = macd_data['MACD']
+        plot_data['Signal_Line'] = macd_data['Signal_Line']
     
     # Ensure 'MACD' is present before calling calculate_macd_divergences
-    if 'MACD' in plot_data.columns:
+        if 'MACD' in plot_data.columns:
         # Calculate divergences and output the dates
-        plot_data = calculate_macd_divergences(plot_data)
-    else:
-        print("Error: MACD column is missing from plot_data!")
+            buyableBool = calculate_macd_divergences(plot_data)
+        else:
+            print("Error: MACD column is missing from plot_data!")
+        if buyableBool == True:
+            buyable_tickers.append(ticker)
+    print(buyable_tickers)
