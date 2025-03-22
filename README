@@ -1,0 +1,13 @@
+tv-monitoring
+can create infinitely long watchlists for tradingview tabs
+can import comma separated lists of tickers
+later can be used with the data gatherer for better visualisation
+
+version 1
+analysis.py can plot the candlesticks and macd diagram using mplfinance
+
+version 2
+removed the plotting function because implementation is complicated
+running analysis.py can give the timestamps for when divergences occur (on the daily chart)
+
+version 3
