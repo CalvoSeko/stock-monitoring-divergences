@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import numpy as np
 
 # translated from pinescript
-def find_pivot_points(data, lookback_left=5, lookback_right=5):
+def find_pivot_points(data, lookback_left=5, lookback_right=2):
     """Find pivot high and low points in the data."""
     data = data.copy()
     
@@ -67,7 +67,7 @@ def calculate_macd(data, short_window=12, long_window=26, signal_window=9):
     
     return data[['Close', 'MACD', 'Signal_Line']]
 
-def calculate_macd_divergences(data, lookback_left=5, lookback_right=5):
+def calculate_macd_divergences(data, lookback_left=5, lookback_right=2):
     """Calculate MACD divergences and return the dates of buy/sell signals."""
     data = data.copy()
 
@@ -130,7 +130,7 @@ def calculate_macd_divergences(data, lookback_left=5, lookback_right=5):
 
     # Combine and sort all bullish divergence dates
     all_bull_div_dates = sorted(bull_div_dates + hidden_bull_div_dates)
-
+    print(all_bull_div_dates)
     # Check if the latest bullish divergence is within the last 5 days
     currently_buyable = False
     if all_bull_div_dates:
@@ -138,7 +138,6 @@ def calculate_macd_divergences(data, lookback_left=5, lookback_right=5):
         latest_stock_date = data.index[-1]
         if (latest_stock_date - latest_divergence_date).days <= 5:
             currently_buyable = True
-    print(currently_buyable)
     return currently_buyable
 
 def load_tickers_from_file(filename):
@@ -150,7 +149,6 @@ def load_tickers_from_file(filename):
     return tickers
 
 ticker_list = load_tickers_from_file("tickers.txt")
-print(ticker_list)
 buyable_tickers = []
 
 
@@ -158,6 +156,7 @@ if __name__ == "__main__":
     
     # Calculate dates dynamically
     end_date = datetime.now().strftime("%Y-%m-%d")
+    end_date = datetime(2024, 9, 13)
     start_date = (datetime.now() - timedelta(days=1*365)).strftime("%Y-%m-%d")   
     for ticker in ticker_list:
         print(ticker)
@@ -180,4 +179,5 @@ if __name__ == "__main__":
             print("Error: MACD column is missing from plot_data!")
         if buyableBool == True:
             buyable_tickers.append(ticker)
+
     print(buyable_tickers)
