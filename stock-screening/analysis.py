@@ -130,7 +130,7 @@ def calculate_macd_divergences(data, lookback_left=5, lookback_right=2):
 
     # Combine and sort all bullish divergence dates
     all_bull_div_dates = sorted(bull_div_dates + hidden_bull_div_dates)
-    print(all_bull_div_dates)
+
     # Check if the latest bullish divergence is within the last 5 days
     currently_buyable = False
     if all_bull_div_dates:
@@ -148,15 +148,16 @@ def load_tickers_from_file(filename):
         tickers = [ticker.strip().upper() for ticker in tickers]  # Clean up spaces and ensure uppercase
     return tickers
 
-ticker_list = load_tickers_from_file("tickers.txt")
-buyable_tickers = []
+
 
 
 if __name__ == "__main__":
-    
+    # initiate lists
+    ticker_list = load_tickers_from_file("tickers.txt")
+    buyable_tickers = []
     # Calculate dates dynamically
     end_date = datetime.now().strftime("%Y-%m-%d")
-    end_date = datetime(2024, 9, 13)
+    #end_date = datetime(2024, 9, 13)
     start_date = (datetime.now() - timedelta(days=1*365)).strftime("%Y-%m-%d")   
     for ticker in ticker_list:
         print(ticker)
